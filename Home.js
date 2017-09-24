@@ -16,36 +16,27 @@ import {
 import _ from 'lodash';
 
 
-GetRepositoryIssuesQuery = gql`
-  query GetRepositoryIssues($states: [IssueState!], $name: String!, $login: String!, $before: String) {
-    repositoryOwner(login: $login) {
-      repository(name: $name) {
-        issues(last: 25, states: $states, before: $before) {
-          edges {
-            node {
-              id
-              title
-            }
-          	cursor
-          }
-          pageInfo {
-            hasPreviousPage
-          }
+GetRepositoriesQuery = gql`
+query ($number_of_repos: Int!) {
+    viewer {
+      name
+      repositories(last: $number_of_repos) {
+        nodes {
+          name
+          id
+          description
         }
       }
     }
   }
 `;
 
-const withIssues = graphql(GetRepositoryIssuesQuery, {
-  options: ({ login, name }) => ({
+const withRepositories = graphql(GetRepositoriesQuery, {
+  options: {
     variables: {
-      states: ['OPEN'],
-      login,
-      name,
-      before: null,
+      number_of_repos: 3
     }
-  }),
+  },
   props: ({ data }) => {
     if (data.loading) {
       return { loading: true, fetchNextPage: () => {} };
@@ -55,42 +46,42 @@ const withIssues = graphql(GetRepositoryIssuesQuery, {
       console.log(data.error);
     }
 
+    console.log(data.viewer);
+
     return {
       // We don't want our UI component to be aware of the special shape of
       // GraphQL connections, so we transform the props into a simple array
       // directly in the container. We also reverse the list since we want to
       // start from the most recent issue and scroll down
-      issues: [...data.repositoryOwner.repository.issues.edges.map(({ node }) => node)].reverse(),
-      hasNextPage: data.repositoryOwner.repository.issues.pageInfo.hasPreviousPage,
+      repositories: data.viewer.repositories.nodes
     };
   },
 });
 
-class Repository extends React.Component{
+class Home extends React.Component{
   constructor(props) {
     super();
     this.state = {
-      dataSource: props.issues
+      dataSource: props.repositories
     };
   }
 
   componentWillReceiveProps(newProps) {
     if (newProps.loading) { return; }
     this.setState({
-      dataSource: newProps.issues
+      dataSource: newProps.repositories
     })
   }
 
   _renderItem = ({item}) => (
-    <TouchableHighlight onPress={() => this.props.goToIssue(item.id, item.title)}>
+      <TouchableHighlight>
       <Text style={styles.welcome} key={item.id}>
-        {item.title}
+        {item.name}
       </Text>
     </TouchableHighlight>
   );
 
   render() {
-    const { issues, goToIssue, hasNextPage, fetchNextPage } = this.props;
 
     return (
       <View style={{flex: 1}}>
@@ -100,9 +91,9 @@ class Repository extends React.Component{
   }
 }
 
-const IssuesWithData = withIssues(Repository);
+const RepositoriesWithData = withRepositories(Home);
 
-export default IssuesWithData;
+export default RepositoriesWithData;
 
 const styles = StyleSheet.create({
   container: {

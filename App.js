@@ -21,9 +21,12 @@ import gql from 'graphql-tag';
 
 import Repository from './repository';
 import Issue from './issue';
+import RepositoriesWithData from './Home';
 
 import { username, password } from './config';
 import {StackNavigator} from "react-navigation";
+
+
 
 let TOKEN = null;
 
@@ -49,9 +52,6 @@ class IssueReader extends Component {
   state = {
     login: false,
   };
-
-  static user = 'gengjiawen';
-  static name = 'desktop';
   static navigationOptions = {
     title: `fewhnhouse/musicshare-brainstorming`,
   };
@@ -78,15 +78,18 @@ class IssueReader extends Component {
       },
     };
   }
+  /*
+  <Repository login={login} name={name} goToIssue={(id, title) => {
+            return this.props.navigation.navigate("Issue", {id: id, title})
+          }}/>
+  */
   render() {
     const login = 'fewhnhouse';
     const name = 'musicshare-brainstorming';
     return this.state.login ? (
       <ApolloProvider client={client}>
         <View style={styles.container}>
-          <Repository login={login} name={name} goToIssue={(id, title) => {
-            return this.props.navigation.navigate("Issue", {id: id, title})
-          }}/>
+          <RepositoriesWithData/>
         </View>
       </ApolloProvider>
     ) : <Text>Logging in</Text>;
