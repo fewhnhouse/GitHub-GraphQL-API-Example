@@ -79,7 +79,7 @@ class IssueReader extends Component {
     };
   }
   render() {
-    const login = 'apollostack';
+    const login = 'apollographql';
     const name = 'apollo-client';
     return this.state.login ? (
       <ApolloProvider client={client}>
