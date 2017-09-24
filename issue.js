@@ -13,6 +13,7 @@ import {
   TouchableHighlight,
   WebView,
   ListView,
+  FlatList
 } from 'react-native';
 
 import _ from 'lodash';
@@ -62,31 +63,9 @@ const withIssueComments = graphql(IssueCommentsQuery, {
       console.log(data.error);
     }
 
-    // ToastAndroid.show(JSON.stringify(data), ToastAndroid.LONG);
-
-    const fetchNextPage = () => {
-      return data.fetchMore({
-        variables: {
-          after: _.last(data.node.comments.edges).cursor,
-        },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          return {
-            node: {
-              comments: {
-                // Append new comments to the end
-                edges: [...previousResult.node.comments.edges, ...fetchMoreResult.data.node.comments.edges],
-                pageInfo: fetchMoreResult.data.node.comments.pageInfo,
-              }
-            }
-          }
-        }
-      })
-    }
-
     return {
       comments: data.node.comments.edges.map(({ node }) => node),
       hasNextPage: data.node.comments.pageInfo.hasNextPage,
-      fetchNextPage,
     };
   }
 });
@@ -95,10 +74,8 @@ class Issue extends React.Component {
   constructor(props) {
     super();
 
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-
     this.state = {
-      dataSource: ds.cloneWithRows(props.comments || []),
+      dataSource: props.comments
     };
   }
 
@@ -106,34 +83,27 @@ class Issue extends React.Component {
     if (newProps.loading) { return; }
 
     this.setState({
-      dataSource: this.state.dataSource.cloneWithRows(newProps.comments)
+      dataSource: newProps.comments
     })
   }
+  _renderItem = ({item}) => (
+    <View key={item.id}>
+      {console.log(item)}
+    <Text style={styles.commentAuthor}>
+      {item.author.login}
+    </Text>
+    <Text style={styles.commentBody}>
+      {item.body}
+    </Text>
+  </View>
+  )
 
   render() {
     const { comments, hasNextPage, loading, fetchNextPage } = this.props;
 
     return (
       <View style={{flex: 1}}>
-        <ListView
-          renderScrollComponent={props => <InfiniteScrollView {...props} />}
-          dataSource={this.state.dataSource}
-          renderRow={(comment) => {
-            return (
-              <View key={comment.id}>
-                <Text style={styles.commentAuthor}>
-                  {comment.author.login}
-                </Text>
-                <Text style={styles.commentBody}>
-                  {comment.body}
-                </Text>
-              </View>
-            )
-          }}
-          onLoadMoreAsync={fetchNextPage}
-          canLoadMore={hasNextPage}
-          enableEmptySections={true}
-        />
+        <FlatList data={this.state.dataSource} renderItem={this._renderItem}/>
       </View>
     );
   }

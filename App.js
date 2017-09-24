@@ -53,7 +53,7 @@ class IssueReader extends Component {
   static user = 'gengjiawen';
   static name = 'desktop';
   static navigationOptions = {
-    title: `apollostack/apollo-client`,
+    title: `fewhnhouse/musicshare-brainstorming`,
   };
 
   componentDidMount() {
@@ -79,8 +79,8 @@ class IssueReader extends Component {
     };
   }
   render() {
-    const login = 'apollographql';
-    const name = 'apollo-client';
+    const login = 'fewhnhouse';
+    const name = 'musicshare-brainstorming';
     return this.state.login ? (
       <ApolloProvider client={client}>
         <View style={styles.container}>

@@ -10,7 +10,7 @@ import {
   ToastAndroid,
   TouchableHighlight,
   WebView,
-  ListView,
+  FlatList,
 } from 'react-native';
 
 import _ from 'lodash';
@@ -57,31 +57,6 @@ const withIssues = graphql(GetRepositoryIssuesQuery, {
       console.log(data.error);
     }
 
-    const fetchNextPage = () => {
-      return data.fetchMore({
-        variables: {
-          before: _.first(data.repositoryOwner.repository.issues.edges).cursor,
-        },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          return {
-            repositoryOwner: {
-              repository: {
-                issues: {
-                  // Append new issues to the front of the list, since we're
-                  // paginating backwards
-                  edges: [
-                    ...fetchMoreResult.data.repositoryOwner.repository.issues.edges,
-                    ...previousResult.repositoryOwner.repository.issues.edges,
-                  ],
-                  pageInfo: fetchMoreResult.data.repositoryOwner.repository.issues.pageInfo,
-                }
-              }
-            }
-          }
-        }
-      })
-    }
-
     return {
       // We don't want our UI component to be aware of the special shape of
       // GraphQL connections, so we transform the props into a simple array
@@ -89,7 +64,6 @@ const withIssues = graphql(GetRepositoryIssuesQuery, {
       // start from the most recent issue and scroll down
       issues: [...data.repositoryOwner.repository.issues.edges.map(({ node }) => node)].reverse(),
       hasNextPage: data.repositoryOwner.repository.issues.pageInfo.hasPreviousPage,
-      fetchNextPage,
     };
   },
 });
@@ -97,27 +71,37 @@ const withIssues = graphql(GetRepositoryIssuesQuery, {
 class Repository extends React.Component{
   constructor(props) {
     super();
-
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-
     this.state = {
-      dataSource: ds.cloneWithRows(props.issues || []),
+      dataSource: props.issues
     };
   }
 
   componentWillReceiveProps(newProps) {
     if (newProps.loading) { return; }
-
     this.setState({
-      dataSource: this.state.dataSource.cloneWithRows(newProps.issues)
+      dataSource: newProps.issues
     })
   }
+
+  _renderItem = ({item}) => (
+    <TouchableHighlight onPress={() => this.props.goToIssue(item.id, item.title)}>
+      <Text style={styles.welcome} key={item.id}>
+        {item.title}
+      </Text>
+    </TouchableHighlight>
+  );
 
   render() {
     const { issues, goToIssue, hasNextPage, fetchNextPage } = this.props;
 
     return (
       <View style={{flex: 1}}>
+        <FlatList data={this.state.dataSource} renderItem={this._renderItem}/>
+      </View>
+    );
+  }
+}
+/*
         <ListView
           renderScrollComponent={props => <InfiniteScrollView {...props} />}
           dataSource={this.state.dataSource}
@@ -133,11 +117,8 @@ class Repository extends React.Component{
           onLoadMoreAsync={fetchNextPage}
           canLoadMore={hasNextPage}
           enableEmptySections={true}
-        />
-      </View>
-    );
-  }
-}
+        />  
+*/
 
 const IssuesWithData = withIssues(Repository);
 
