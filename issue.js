@@ -88,7 +88,6 @@ class Issue extends React.Component {
   }
   _renderItem = ({item}) => (
     <View key={item.id}>
-      {console.log(item)}
     <Text style={styles.commentAuthor}>
       {item.author.login}
     </Text>

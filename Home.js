@@ -8,7 +8,7 @@ import {
   View,
   ScrollView,
   ToastAndroid,
-  TouchableHighlight,
+  TouchableOpacity,
   WebView,
   FlatList,
 } from 'react-native';
@@ -25,6 +25,10 @@ query ($number_of_repos: Int!) {
           name
           id
           description
+          owner {
+            id
+            login
+          }
         }
       }
     }
@@ -34,7 +38,7 @@ query ($number_of_repos: Int!) {
 const withRepositories = graphql(GetRepositoriesQuery, {
   options: {
     variables: {
-      number_of_repos: 3
+      number_of_repos: 10
     }
   },
   props: ({ data }) => {
@@ -45,9 +49,6 @@ const withRepositories = graphql(GetRepositoriesQuery, {
     if (data.error) {
       console.log(data.error);
     }
-
-    console.log(data.viewer);
-
     return {
       // We don't want our UI component to be aware of the special shape of
       // GraphQL connections, so we transform the props into a simple array
@@ -74,11 +75,11 @@ class Home extends React.Component{
   }
 
   _renderItem = ({item}) => (
-      <TouchableHighlight>
+      <TouchableOpacity onPress={() => this.props.goToRepo(item.id, item.name, item.owner.login)}>
       <Text style={styles.welcome} key={item.id}>
         {item.name}
       </Text>
-    </TouchableHighlight>
+    </TouchableOpacity>
   );
 
   render() {

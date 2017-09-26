@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import {graphql, ApolloProvider} from 'react-apollo';
 import React from 'react';
 import {
   AppRegistry,
@@ -8,15 +8,14 @@ import {
   View,
   ScrollView,
   ToastAndroid,
-  TouchableHighlight,
+  TouchableOpacity,
   WebView,
-  FlatList,
+  FlatList
 } from 'react-native';
 
 import _ from 'lodash';
 
-
-GetRepositoryIssuesQuery = gql`
+GetRepositoryIssuesQuery = gql `
   query GetRepositoryIssues($states: [IssueState!], $name: String!, $login: String!, $before: String) {
     repositoryOwner(login: $login) {
       repository(name: $name) {
@@ -38,17 +37,20 @@ GetRepositoryIssuesQuery = gql`
 `;
 
 const withIssues = graphql(GetRepositoryIssuesQuery, {
-  options: ({ login, name }) => ({
+  options: ({id, navigation}) => ({
     variables: {
       states: ['OPEN'],
-      login,
-      name,
-      before: null,
+      login: navigation.state.params.login,
+      name: navigation.state.params.title,
+      before: null
     }
   }),
-  props: ({ data }) => {
+  props: ({data}) => {
     if (data.loading) {
-      return { loading: true, fetchNextPage: () => {} };
+      return {
+        loading: true,
+        fetchNextPage: () => {}
+      };
     }
 
     if (data.error) {
@@ -56,17 +58,24 @@ const withIssues = graphql(GetRepositoryIssuesQuery, {
     }
 
     return {
-      // We don't want our UI component to be aware of the special shape of
-      // GraphQL connections, so we transform the props into a simple array
-      // directly in the container. We also reverse the list since we want to
-      // start from the most recent issue and scroll down
-      issues: [...data.repositoryOwner.repository.issues.edges.map(({ node }) => node)].reverse(),
-      hasNextPage: data.repositoryOwner.repository.issues.pageInfo.hasPreviousPage,
+      // We don't want our UI component to be aware of the special shape of GraphQL
+      // connections, so we transform the props into a simple array directly in the
+      // container. We also reverse the list since we want to start from the most
+      // recent issue and scroll down
+      issues: [
+        ...data
+          .repositoryOwner
+          .repository
+          .issues
+          .edges
+          .map(({node}) => node)
+      ].reverse(),
+      hasNextPage: data.repositoryOwner.repository.issues.pageInfo.hasPreviousPage
     };
-  },
+  }
 });
 
-class Repository extends React.Component{
+class Repository extends React.Component {
   constructor(props) {
     super();
     this.state = {
@@ -75,27 +84,39 @@ class Repository extends React.Component{
   }
 
   componentWillReceiveProps(newProps) {
-    if (newProps.loading) { return; }
-    this.setState({
-      dataSource: newProps.issues
-    })
+    if (newProps.loading) {
+      return;
+    }
+    this.setState({dataSource: newProps.issues})
   }
 
   _renderItem = ({item}) => (
-    <TouchableHighlight onPress={() => this.props.goToIssue(item.id, item.title)}>
+    <TouchableOpacity
+      onPress={() => {
+      this
+        .props
+        .navigation
+        .state
+        .params
+        .goToIssue(item.id, item.title)
+    }}>
       <Text style={styles.welcome} key={item.id}>
         {item.title}
       </Text>
-    </TouchableHighlight>
+    </TouchableOpacity>
   );
 
   render() {
-    const { issues, goToIssue, hasNextPage, fetchNextPage } = this.props;
-
+    const {issues, goToIssue, hasNextPage, fetchNextPage} = this.props;
+    console.log("nav: ", this.props.navigation);
     return (
-      <View style={{flex: 1}}>
+      <ApolloProvider client={this.props.navigation.state.params.client}>
+      <View style={{
+        flex: 1
+      }}>
         <FlatList data={this.state.dataSource} renderItem={this._renderItem}/>
       </View>
+      </ApolloProvider>
     );
   }
 }
@@ -106,16 +127,16 @@ export default IssuesWithData;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   welcome: {
     fontSize: 20,
     textAlign: 'center',
-    margin: 10,
+    margin: 10
   },
   instructions: {
     textAlign: 'center',
     color: '#333333',
-    marginBottom: 5,
-  },
+    marginBottom: 5
+  }
 });
