@@ -110,13 +110,11 @@ class Repository extends React.Component {
     const {issues, goToIssue, hasNextPage, fetchNextPage} = this.props;
     console.log("nav: ", this.props.navigation);
     return (
-      <ApolloProvider client={this.props.navigation.state.params.client}>
       <View style={{
         flex: 1
       }}>
         <FlatList data={this.state.dataSource} renderItem={this._renderItem}/>
       </View>
-      </ApolloProvider>
     );
   }
 }

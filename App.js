@@ -147,7 +147,7 @@ const SimpleApp = StackNavigator({
   }
 });
 
-/*
+
 const MyApp = TabNavigator({
   Home: {
     screen: SimpleApp,
@@ -162,7 +162,7 @@ const MyApp = TabNavigator({
     activeTintColor: '#e91e63',
   },
 });
-*/
+
 
 function ApolloWrapper(CMP) {
   return class extends Component {
@@ -176,4 +176,4 @@ function ApolloWrapper(CMP) {
   };
 }
 
-export default SimpleApp
+export default MyApp
