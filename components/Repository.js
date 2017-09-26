@@ -10,7 +10,8 @@ import {
   ToastAndroid,
   TouchableOpacity,
   WebView,
-  FlatList
+  FlatList,
+  ActivityIndicator
 } from 'react-native';
 
 import _ from 'lodash';
@@ -76,9 +77,8 @@ const withIssues = graphql(GetRepositoryIssuesQuery, {
 });
 
 class Repository extends React.Component {
-  static navigationOptions = {
-    title: "Repository"
-  }
+  static navigationOptions = ({navigation}) => ({title: navigation.state.params.title});
+
   constructor(props) {
     super();
     this.state = {
@@ -112,13 +112,24 @@ class Repository extends React.Component {
   render() {
     const {issues, goToIssue, hasNextPage, fetchNextPage} = this.props;
     console.log("nav: ", this.props.navigation);
-    return (
-      <View style={{
-        flex: 1
-      }}>
-        <FlatList data={this.state.dataSource} renderItem={this._renderItem}/>
-      </View>
-    );
+    return this.state.dataSource
+      ? (
+        <View style={{
+          flex: 1
+        }}>
+          {(this.state.dataSource.length !== 0
+            ? (<FlatList data={this.state.dataSource} renderItem={this._renderItem}/>)
+            : (
+              <Text>This repository has no issues.</Text>
+            ))}
+        </View>
+      )
+      : (
+        <View style={styles.loading}>
+          <ActivityIndicator animating={true} size={'small'}/>
+          <Text>Loading issues...</Text>
+        </View>
+      );
   }
 }
 
@@ -139,5 +150,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333333',
     marginBottom: 5
+  },
+  loading: {
+    paddingTop: 10,
+    alignItems: 'center'
   }
 });

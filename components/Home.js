@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   WebView,
   FlatList,
+  ActivityIndicator
 } from 'react-native';
 
 import _ from 'lodash';
@@ -38,7 +39,7 @@ query ($number_of_repos: Int!) {
 const withRepositories = graphql(GetRepositoriesQuery, {
   options: {
     variables: {
-      number_of_repos: 10
+      number_of_repos: 5
     }
   },
   props: ({ data }) => {
@@ -72,23 +73,40 @@ class Home extends React.Component{
     this.setState({
       dataSource: newProps.repositories
     })
+    console.log("Received props: ",this.state.dataSource);
+  }
+
+  componentWillUpdate() {
+    console.log(this.state.dataSource);
   }
 
   _renderItem = ({item}) => (
       <TouchableOpacity onPress={() => this.props.goToRepo(item.id, item.name, item.owner.login)}>
-      <Text style={styles.welcome} key={item.id}>
+      <View style={styles.card}>
+      <Text style={styles.cardTitle} key={item.id}>
         {item.name}
       </Text>
+      <Text style={styles.cardBody}>
+        cardBody
+      </Text>
+      </View>
     </TouchableOpacity>
   );
 
   render() {
-
-    return (
+    console.log(this.state.dataSource);
+    return this.state.dataSource
+    ?
+      (
       <View style={{flex: 1}}>
         <FlatList data={this.state.dataSource} renderItem={this._renderItem}/>
       </View>
-    );
+    ) : (
+      <View style={styles.loading}>
+      <ActivityIndicator animating={true} size={'small'}/>
+      <Text>Loading Repositories...</Text> 
+      </View>
+    )
   }
 }
 
@@ -97,6 +115,35 @@ const RepositoriesWithData = withRepositories(Home);
 export default RepositoriesWithData;
 
 const styles = StyleSheet.create({
+  loading: {
+    paddingTop: 10,
+    alignItems: 'center'
+  },
+  card: {
+    backgroundColor: 'white',
+    padding: 10,
+    shadowRadius: 1,
+    borderRadius: 2,
+    borderWidth: 0.5,
+    borderColor: 'grey',
+    margin: 5,
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 3
+    },
+    shadowRadius: 5,
+    shadowOpacity: 1.0
+
+},
+cardTitle: {
+    textAlign: 'center'
+},
+cardBody: {
+    borderTopWidth: 1,
+    borderColor: 'grey',
+    padding: 5
+},
   container: {
     flex: 1,
   },

@@ -13,7 +13,8 @@ import {
   TouchableHighlight,
   WebView,
   ListView,
-  FlatList
+  FlatList,
+  ActivityIndicator
 } from 'react-native';
 
 import _ from 'lodash';
@@ -71,9 +72,9 @@ const withIssueComments = graphql(IssueCommentsQuery, {
 });
 
 class Issue extends React.Component {
-  static navigationOptions = {
-    title: "Issue"
-  }
+  static navigationOptions = ({navigation}) => ({
+    title: navigation.state.params.title
+  });
   constructor(props) {
     super();
 
@@ -103,9 +104,14 @@ class Issue extends React.Component {
   render() {
     const { comments, hasNextPage, loading, fetchNextPage } = this.props;
 
-    return (
+    return this.state.dataSource? (
       <View style={{flex: 1}}>
         <FlatList data={this.state.dataSource} renderItem={this._renderItem}/>
+      </View>
+    ) : (
+      <View style={styles.loading}>
+      <ActivityIndicator animating={true} size={'small'}/>
+      <Text>Loading issue...</Text>
       </View>
     );
   }
@@ -116,6 +122,10 @@ export default withIssueComments(Issue);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loading: {
+    paddingTop: 10,
+    alignItems: 'center'
   },
   commentAuthor: {
     fontWeight: 'bold',
