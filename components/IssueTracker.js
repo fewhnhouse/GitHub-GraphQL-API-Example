@@ -16,25 +16,11 @@ import _ from 'lodash';
 import Home from './Home';
 
 export default class IssueTracker extends Component {
+  static navigationOptions = {
+    title: "Repositories: fewhnhouse"
+  }  
   
-    routeForRepository(login, name) {
-      return {
-        title: `${login}/${name}`,
-        component: Repository,
-        passProps: {
-          login,
-          name,
-          goToIssue: (id, title) => {
-            this
-              .refs
-              .nav
-              .push(this.routeForIssue(id, title));
-          }
-        }
-      }
-    }
-  
-    render() {
+  render() {
       return (
             <View style={styles.container}>
               <Home

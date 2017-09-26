@@ -22,8 +22,8 @@ Before getting started make sure you have registered to get access to the [GitHu
 
 The UI is pretty basic, with only the default styling. The first page is the list of issues for the Apollo Client repository, and if you tap you can see the comments for that issue on the second page. As you scroll down, the app eventually loads all of the issues and comments.
 
-<img src="screenshot.png" width="300" />
-<img src="screenshot2.png" width="300" />
+<img src="assets/screenshot.png" width="300" />
+<img src="assets/screenshot2.png" width="300" />
 
 ### Contributing
 

@@ -71,6 +71,9 @@ const withIssueComments = graphql(IssueCommentsQuery, {
 });
 
 class Issue extends React.Component {
+  static navigationOptions = {
+    title: "Issue"
+  }
   constructor(props) {
     super();
 

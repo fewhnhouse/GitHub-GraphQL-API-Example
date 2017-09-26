@@ -1,30 +1,20 @@
 import React, {Component} from 'react';
-import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  Platform,
-  NavigatorIOS,
-  ToastAndroid,
-  PlatformOSType
-} from 'react-native';
 
 import _ from 'lodash';
 
-import {graphql, ApolloProvider} from 'react-apollo';
-import {login} from './githubLogin';
+import {Text, PlatformOSType, StyleSheet} from 'react-native';
+import {ApolloProvider} from 'react-apollo';
+import {login} from './auth/githubLogin';
 
 import ApolloClient, {createNetworkInterface} from 'apollo-client';
-import gql from 'graphql-tag';
 
-import Repository from './repository';
-import Issue from './issue';
-import Home from './Home';
-import NewScreen from './NewScreen';
+import Repository from './components/Repository';
+import Issue from './components/Issue';
+import NewScreen from './components/NewScreen';
+import IssueTracker from './components/IssueTracker';
+import Loading from './components/Loading';
 
-import {username, password} from './config';
+import {username, password} from './auth/config';
 import {StackNavigator, TabNavigator} from "react-navigation";
 
 let TOKEN = null;
@@ -37,7 +27,6 @@ networkInterface.use([
       if (!req.options.headers) {
         req.options.headers = {}; // Create the header object if needed.
       }
-
       // Send the login token in the Authorization header
       req.options.headers.authorization = `Bearer ${TOKEN}`;
       next();
@@ -47,12 +36,9 @@ networkInterface.use([
 
 const client = new ApolloClient({networkInterface});
 
-class IssueReader extends Component {
+export default class App extends Component {
   state = {
     login: false
-  };
-  static navigationOptions = {
-    title: `Repositories: fewhnhouse`
   };
 
   componentDidMount() {
@@ -64,83 +50,30 @@ class IssueReader extends Component {
       this.setState({login: true});
     });
   }
-  routeForRepository(login, name) {
-    return {
-      title: `${login}/${name}`,
-      component: Repository,
-      passProps: {
-        login,
-        name,
-        goToIssue: (id, title) => {
-          this
-            .refs
-            .nav
-            .push(this.routeForIssue(id, title));
-        }
-      }
-    }
-  }
   
   render() {
     return this.state.login
       ? (
         <ApolloProvider client={client}>
-          <View style={styles.container}>
-            <Home
-              goToRepo={(id, name, login) => {
-              return this
-                .props
-                .navigation
-                .navigate("Repository", {
-                  id: id,
-                  title: name,
-                  login: login,
-                  goToIssue: (id, title) => {
-                    return this
-                      .props
-                      .navigation
-                      .navigate("Issue", {
-                        id: id,
-                        title,
-                      })
-                  }
-                })
-            }}/>
-          </View>
+          <TabNav/>
         </ApolloProvider>
       )
-      : <Text>Logging in</Text>;
+      : <Loading/>;
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5
-  }
-});
-
-const SimpleApp = StackNavigator({
+const StackNav = StackNavigator({
   Home: {
-    screen: IssueReader
+    screen: IssueTracker
   },
   Repository: {
-    screen: ApolloWrapper(Repository),
+    screen: (Repository),
     navigationOptions: ({navigation}) => {
       title : `test1${navigation.state.params.title}`;
     }
   },
   Issue: {
-    screen: ApolloWrapper(Issue),
+    screen: (Issue),
     navigationOptions: ({navigation}) => {
       title : `test1${navigation.state.params.title}`;
     }
@@ -148,9 +81,9 @@ const SimpleApp = StackNavigator({
 });
 
 
-const MyApp = TabNavigator({
+const TabNav = TabNavigator({
   Home: {
-    screen: SimpleApp,
+    screen: StackNav,
   },
   Notifications: {
     screen: NewScreen,
@@ -176,4 +109,3 @@ function ApolloWrapper(CMP) {
   };
 }
 
-export default MyApp

@@ -76,6 +76,9 @@ const withIssues = graphql(GetRepositoryIssuesQuery, {
 });
 
 class Repository extends React.Component {
+  static navigationOptions = {
+    title: "Repository"
+  }
   constructor(props) {
     super();
     this.state = {
