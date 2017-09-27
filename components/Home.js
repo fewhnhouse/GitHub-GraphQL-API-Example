@@ -82,7 +82,7 @@ class Home extends React.Component{
 
   _renderItem = ({item}) => (
       <TouchableOpacity onPress={() => this.props.goToRepo(item.id, item.name, item.owner.login)}>
-      <View style={styles.card}>
+      <View elevation={5} style={styles.card}>
       <Text style={styles.cardTitle} key={item.id}>
         {item.name}
       </Text>

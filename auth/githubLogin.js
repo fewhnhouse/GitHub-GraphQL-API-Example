@@ -31,14 +31,17 @@ export function login(name, pwd) {
       'note': 'not abuse'
     })
   })
-    .then((response) => {
+    .then((response, reject) => {
+      if(reject) {
+        console.log(reject);
+      }
       const isValid = response.status < 400;
       const body = response._bodyInit;
       return response.json().then((json) => {
         if (isValid) {
           return json.token;
         } else {
-          throw new Error(json.message);
+          throw new Error("Network Error: ",json.message);
         }
       });
     });
