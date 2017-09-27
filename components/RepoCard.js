@@ -17,15 +17,15 @@ export default class RepoCard extends Component {
                         style={styles.cardComponent}
                         name='repo-forked'
                         size={12}>
-                        <Text style={styles.cardText}>{` ${this.props.item.forks.totalCount} Forks`}
+                        <Text style={styles.cardText}>{` ${this.props.item.forks} Forks`}
                         </Text>
                     </Octicons>
                     <Octicons color='#f1c40f' style={styles.cardComponent} name='star' size={12}>
-                        <Text style={styles.cardText}>{` ${this.props.item.stargazers.totalCount} Stargazers`}
+                        <Text style={styles.cardText}>{` ${this.props.item.stargazers} Stargazers`}
                         </Text>
                     </Octicons>
                     <Octicons color='#2980b9' style={styles.cardComponent} name='eye' size={12}>
-                        <Text style={styles.cardText}>{` ${this.props.item.watchers.totalCount} Watchers`}
+                        <Text style={styles.cardText}>{` ${this.props.item.watchers} Watchers`}
                         </Text>
                     </Octicons>
                 </View>
@@ -34,7 +34,7 @@ export default class RepoCard extends Component {
                         style={styles.cardButton}
                         onPress={() => this.props.goToRepo(this.props.item.id, this.props.item.name, this.props.item.owner.login)}>
                         <Octicons color='red' name='issue-opened' size={18}>
-                            <Text style={styles.cardText}>{` ${this.props.item.issues.totalCount} Issues`}</Text>
+                            <Text style={styles.cardText}>{` ${this.props.item.issues} Issues`}</Text>
                         </Octicons>
                     </TouchableOpacity>
                 </View>

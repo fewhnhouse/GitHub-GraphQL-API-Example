@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 
 import _ from 'lodash';
 
-import {Text, Platform, StyleSheet} from 'react-native';
+import {View, Text, Platform, StyleSheet} from 'react-native';
 import {ApolloProvider} from 'react-apollo';
 import {login} from './auth/githubLogin';
 
@@ -16,6 +16,7 @@ import Loading from './components/Loading';
 
 import {username, password} from './auth/config';
 import {StackNavigator, TabNavigator} from "react-navigation";
+import {Constants} from 'expo';
 
 let TOKEN = null;
 
@@ -46,10 +47,10 @@ export default class App extends Component {
       throw new Error('Please create a config.js your username and password.');
     }
     login(username, password, (req, res) => {
-      if(req) {
-        console.log("req:",req);
+      if (req) {
+        console.log("req:", req);
       } else {
-        console.log("res:",res);
+        console.log("res:", res);
       }
     }).then((token) => {
       TOKEN = token;
@@ -99,7 +100,12 @@ const TabNav = TabNavigator({
     : 'top',
   animationEnabled: true,
   tabBarOptions: {
-    activeTintColor: '#e91e63'
+    activeTintColor: '#e91e63',
+    style: {
+      paddingTop: Platform.OS === 'ios'
+        ? 0
+        : Constants.statusBarHeight
+    }
   }
 });
 
@@ -114,3 +120,11 @@ function ApolloWrapper(CMP) {
     }
   };
 }
+
+const styles = StyleSheet.create({
+  app: {
+    paddingTop: Platform.OS === 'ios'
+      ? 0
+      : Constants.statusBarHeight
+  }
+})

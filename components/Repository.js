@@ -112,7 +112,6 @@ class Repository extends React.Component {
 
   render() {
     const {issues, goToIssue, hasNextPage, fetchNextPage} = this.props;
-    console.log("nav: ", this.props.navigation);
     return this.state.dataSource
       ? (
         <View style={{
