@@ -45,7 +45,13 @@ export default class App extends Component {
     if (username === 'xxx') {
       throw new Error('Please create a config.js your username and password.');
     }
-    login(username, password).then((token) => {
+    login(username, password, (req, res) => {
+      if(req) {
+        console.log("req:",req);
+      } else {
+        console.log("res:",res);
+      }
+    }).then((token) => {
       TOKEN = token;
       this.setState({login: true});
     });
