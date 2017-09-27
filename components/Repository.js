@@ -13,6 +13,9 @@ import {
   FlatList,
   ActivityIndicator
 } from 'react-native';
+import {Divider} from 'react-native-elements';
+
+import IssueCard from './IssueCard';
 
 import _ from 'lodash';
 
@@ -25,6 +28,8 @@ GetRepositoryIssuesQuery = gql `
             node {
               id
               title
+              comments {totalCount}
+              createdAt              
             }
           	cursor
           }
@@ -69,7 +74,9 @@ const withIssues = graphql(GetRepositoryIssuesQuery, {
           .repository
           .issues
           .edges
-          .map(({node}) => node)
+          .map(({node}) => {
+            return {id: node.id, title: node.title, comments: node.comments.totalCount, createdAt: node.createdAt}
+          })
       ].reverse(),
       hasNextPage: data.repositoryOwner.repository.issues.pageInfo.hasPreviousPage
     };
@@ -94,21 +101,9 @@ class Repository extends React.Component {
   }
   _keyExtractor = (item, index) => (item.id);
 
-  _renderItem = ({item}) => (
-    <TouchableOpacity
-      onPress={() => {
-      this
-        .props
-        .navigation
-        .state
-        .params
-        .goToIssue(item.id, item.title)
-    }}>
-      <Text style={styles.welcome} key={item.id}>
-        {item.title}
-      </Text>
-    </TouchableOpacity>
-  );
+  _renderItem = ({item}) => (<IssueCard
+    item={item}
+    goToIssue={this.props.navigation.state.params.goToIssue}/>);
 
   render() {
     const {issues, goToIssue, hasNextPage, fetchNextPage} = this.props;
@@ -148,11 +143,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
     margin: 10
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5
   },
   loading: {
     paddingTop: 10,

@@ -32,7 +32,7 @@ export default class RepoCard extends Component {
                 <View style={styles.cardBody}>
                     <TouchableOpacity
                         style={styles.cardButton}
-                        onPress={() => this.props.goToRepo(this.props.item.id, this.props.item.name, this.props.item.owner.login)}>
+                        onPress={() => this.props.goToRepo(this.props.item.id, this.props.item.name, this.props.item.owner)}>
                         <Octicons color='red' name='issue-opened' size={18}>
                             <Text style={styles.cardText}>{` ${this.props.item.issues} Issues`}</Text>
                         </Octicons>
@@ -57,8 +57,8 @@ const styles = StyleSheet.create({
             width: 0,
             height: 1
         },
-        shadowRadius: 2,
-        shadowOpacity: 1.0
+        shadowRadius: 1,
+        shadowOpacity: 0.8
     },
     cardDescription: {
         margin: 5
