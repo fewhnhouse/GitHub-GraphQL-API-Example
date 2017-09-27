@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 
 import _ from 'lodash';
 
-import {Text, PlatformOSType, StyleSheet} from 'react-native';
+import {Text, Platform, StyleSheet} from 'react-native';
 import {ApolloProvider} from 'react-apollo';
 import {login} from './auth/githubLogin';
 
@@ -50,7 +50,7 @@ export default class App extends Component {
       this.setState({login: true});
     });
   }
-  
+
   render() {
     return this.state.login
       ? (
@@ -80,22 +80,22 @@ const StackNav = StackNavigator({
   }
 });
 
-
 const TabNav = TabNavigator({
   Home: {
-    screen: StackNav,
+    screen: StackNav
   },
   Notifications: {
-    screen: NewScreen,
-  },
+    screen: NewScreen
+  }
 }, {
-  tabBarPosition: PlatformOSType === "ios"? 'bottom' : 'top',
+  tabBarPosition: Platform.OS === "ios"
+    ? 'bottom'
+    : 'top',
   animationEnabled: true,
   tabBarOptions: {
-    activeTintColor: '#e91e63',
-  },
+    activeTintColor: '#e91e63'
+  }
 });
-
 
 function ApolloWrapper(CMP) {
   return class extends Component {
@@ -108,4 +108,3 @@ function ApolloWrapper(CMP) {
     }
   };
 }
-
