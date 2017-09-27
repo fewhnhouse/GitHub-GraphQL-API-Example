@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import {graphql} from 'react-apollo';
 import React from 'react';
 
 import {
@@ -21,7 +21,7 @@ import _ from 'lodash';
 
 import InfiniteScrollView from 'react-native-infinite-scroll-view';
 
-const IssueCommentsQuery = gql`
+const IssueCommentsQuery = gql `
   query GetRepositoryIssues($id: ID!, $after: String) {
     node(id: $id) {
       ... on Issue {
@@ -51,13 +51,16 @@ const withIssueComments = graphql(IssueCommentsQuery, {
     return ({
       variables: {
         id: navigation.state.params.id,
-        after: null,
+        after: null
       }
     });
   },
-  props: ({ data, ownProps }) => {
+  props: ({data, ownProps}) => {
     if (data.loading) {
-      return { loading: true, fetchNextPage: () => {} };
+      return {
+        loading: true,
+        fetchNextPage: () => {}
+      };
     }
 
     if (data.error) {
@@ -65,16 +68,18 @@ const withIssueComments = graphql(IssueCommentsQuery, {
     }
 
     return {
-      comments: data.node.comments.edges.map(({ node }) => node),
-      hasNextPage: data.node.comments.pageInfo.hasNextPage,
+      comments: data
+        .node
+        .comments
+        .edges
+        .map(({node}) => node),
+      hasNextPage: data.node.comments.pageInfo.hasNextPage
     };
   }
 });
 
 class Issue extends React.Component {
-  static navigationOptions = ({navigation}) => ({
-    title: navigation.state.params.title
-  });
+  static navigationOptions = ({navigation}) => ({title: navigation.state.params.title});
   constructor(props) {
     super();
 
@@ -84,36 +89,45 @@ class Issue extends React.Component {
   }
 
   componentWillReceiveProps(newProps) {
-    if (newProps.loading) { return; }
+    if (newProps.loading) {
+      return;
+    }
 
-    this.setState({
-      dataSource: newProps.comments
-    })
+    this.setState({dataSource: newProps.comments})
   }
+  _keyExtractor = (item, index) => (item.id);
+
   _renderItem = ({item}) => (
     <View key={item.id}>
-    <Text style={styles.commentAuthor}>
-      {item.author.login}
-    </Text>
-    <Text style={styles.commentBody}>
-      {item.body}
-    </Text>
-  </View>
+      <Text style={styles.commentAuthor}>
+        {item.author.login}
+      </Text>
+      <Text style={styles.commentBody}>
+        {item.body}
+      </Text>
+    </View>
   )
 
   render() {
-    const { comments, hasNextPage, loading, fetchNextPage } = this.props;
+    const {comments, hasNextPage, loading, fetchNextPage} = this.props;
 
-    return this.state.dataSource? (
-      <View style={{flex: 1}}>
-        <FlatList data={this.state.dataSource} renderItem={this._renderItem}/>
-      </View>
-    ) : (
-      <View style={styles.loading}>
-      <ActivityIndicator animating={true} size={'small'}/>
-      <Text>Loading issue...</Text>
-      </View>
-    );
+    return this.state.dataSource
+      ? (
+        <View style={{
+          flex: 1
+        }}>
+          <FlatList
+            keyExtractor={this._keyExtractor}
+            data={this.state.dataSource}
+            renderItem={this._renderItem}/>
+        </View>
+      )
+      : (
+        <View style={styles.loading}>
+          <ActivityIndicator animating={true} size={'small'}/>
+          <Text>Loading issue...</Text>
+        </View>
+      );
   }
 }
 
@@ -121,7 +135,7 @@ export default withIssueComments(Issue);
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   loading: {
     paddingTop: 10,
@@ -130,11 +144,11 @@ const styles = StyleSheet.create({
   commentAuthor: {
     fontWeight: 'bold',
     fontSize: 20,
-    padding: 10,
+    padding: 10
   },
   commentBody: {
     fontSize: 18,
     padding: 10,
-    paddingBottom: 30,
+    paddingBottom: 30
   }
 });

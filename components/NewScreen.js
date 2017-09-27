@@ -10,41 +10,54 @@ import {
 
 const list = [
     {
-        name: "this"
+        name: "this",
+        id: 1
     }, {
-        name: "is"
+        name: "is",
+        id: 2
     }, {
-        name: "a"
+        name: "a",
+        id: 3
     }, {
-        name: "list"
+        name: "list",
+        id: 4
     }, {
-        name: "of"
+        name: "of",
+        id: 5
     }, {
-        name: "useful"
+        name: "useful",
+        id: 6
     }, {
-        name: "items"
+        name: "items",
+        id: 7
     }, {
-        name: "this"
+        name: "this",
+        id: 8
     }, {
-        name: "is"
+        name: "is",
+        id: 9
     }, {
-        name: "a"
+        name: "a",
+        id: 10
     }, {
-        name: "list"
+        name: "list",
+        id: 11
     }, {
-        name: "of"
+        name: "of",
+        id: 12
     }, {
-        name: "useful"
+        name: "useful",
+        id: 13
     }, {
-        name: "items"
+        name: "items",
+        id: 14
     }
 ];
 export default class NewScreen extends Component {
     state = {}
 
-    _keyExtractor({id}) {
-        return "newscreen-" + id;
-    }
+    _keyExtractor = (item, index) => (item.id);
+
     _renderItem({item, index}) {
         return (
             <TouchableOpacity key={this._keyExtractor} onPress={() => console.log(item)}>
@@ -68,7 +81,10 @@ export default class NewScreen extends Component {
         )
     }
     render() {
-        return (<FlatList data={list} renderItem={this._renderItem}/>);
+        return (<FlatList
+            keyExtractor={this._keyExtractor}
+            data={list}
+            renderItem={this._renderItem}/>);
     }
 }
 

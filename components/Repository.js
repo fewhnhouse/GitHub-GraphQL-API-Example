@@ -92,6 +92,7 @@ class Repository extends React.Component {
     }
     this.setState({dataSource: newProps.issues})
   }
+  _keyExtractor = (item, index) => (item.id);
 
   _renderItem = ({item}) => (
     <TouchableOpacity
@@ -118,7 +119,10 @@ class Repository extends React.Component {
           flex: 1
         }}>
           {(this.state.dataSource.length !== 0
-            ? (<FlatList data={this.state.dataSource} renderItem={this._renderItem}/>)
+            ? (<FlatList
+              keyExtractor={this._keyExtractor}
+              data={this.state.dataSource}
+              renderItem={this._renderItem}/>)
             : (
               <Text>This repository has no issues.</Text>
             ))}
