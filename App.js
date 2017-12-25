@@ -6,7 +6,11 @@ import {View, Text, Platform, StyleSheet} from 'react-native';
 import {ApolloProvider} from 'react-apollo';
 import {login} from './auth/githubLogin';
 
-import ApolloClient, {createNetworkInterface} from 'apollo-client';
+import {ApolloClient} from 'apollo-client';
+import { InMemoryCache } from 'apollo-cache-inmemory';
+
+import { createHttpLink } from 'apollo-link-http';
+import { setContext } from 'apollo-link-context';
 
 import Repository from './components/Repository';
 import Issue from './components/Issue';
@@ -20,6 +24,7 @@ import {Constants} from 'expo';
 
 let TOKEN = null;
 
+/*
 const networkInterface = createNetworkInterface({uri: 'https://api.github.com/graphql'});
 
 networkInterface.use([
@@ -34,8 +39,20 @@ networkInterface.use([
     }
   }
 ]);
+*/
 
-const client = new ApolloClient({networkInterface});
+const httpLink = createHttpLink({ uri: 'https://api.github.com/graphql' });
+
+const middlewareLink = setContext(() => ({
+  headers: { 
+    authorization: `Bearer ${TOKEN}`
+  }
+}));
+
+// use with apollo-client
+const link = middlewareLink.concat(httpLink);
+
+const client = new ApolloClient({link: link, cache: new InMemoryCache()});
 
 export default class App extends Component {
   state = {
